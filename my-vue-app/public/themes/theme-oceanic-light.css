@@ -1,0 +1,29 @@
+:root {
+    --theme-name: "Oceanic Light";
+
+    /* --- 背景色 (亮色系) --- */
+    --bg-color-deep-space: #f0f9ff; /* 极淡的蓝色 */
+    --bg-color-panel: #ffffff;      /* 纯白面板 */
+
+    /* --- 强调色 (加深以适应白底) --- */
+    --primary-accent-color: #0284c7; /* 深天蓝 */
+    --secondary-accent-color: #6366f1; /* 靛蓝 */
+    --primary-accent-color-rgb: 2, 132, 199; /* RGB用于透明度计算 */
+
+    /* --- 边框 --- */
+    --border-color-tech: #bae6fd; /* 淡蓝边框 */
+
+    /* --- 文字颜色 (深色系) --- */
+    --text-color-primary: #0f172a; /* 深蓝黑 */
+    --text-color-secondary: #475569; /* 灰蓝 */
+    --text-color-header: #0f172a;
+
+    --card-bg-color: rgba(255, 255, 255, 0.85); /* 白色半透明 */
+    --code-bg-color: #f1f5f9;                   /* 代码区域浅灰底色 */
+}
+
+/* === 待办清单适配 === */
+:root .todo-item.done .todo-text { color: #94a3b8; }
+:root .todo-item:hover { background-color: #e0f2fe; }
+:root .el-calendar-table .el-calendar-day:hover { background-color: #e0f2fe; }
+:root .el-calendar__header { border-bottom-color: var(--border-color-tech); }

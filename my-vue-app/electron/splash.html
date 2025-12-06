@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            margin: 0;
+            background-color: #0a192f; /* 深空蓝背景 */
+            color: #64ffda; /* 青色文字 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: monospace;
+            user-select: none;
+        }
+        .loader {
+            border: 4px solid rgba(100, 255, 218, 0.1);
+            border-top: 4px solid #64ffda;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+<div class="loader"></div>
+<div id="status">IcePlatform 正在启动中...</div>
+</body>
+</html>

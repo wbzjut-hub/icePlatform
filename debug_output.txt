@@ -1,0 +1,18 @@
+/Users/wangbo/Desktop/Object/aiTalking/backend/venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+INFO:     Started server process [42082]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Loading .env from: /Users/wangbo/Desktop/Object/aiTalking/backend/.env
+🔧 FFmpeg path setup: /Users/wangbo/Desktop/Object/aiTalking/backend/bin
+Database Path: /Users/wangbo/Library/Mobile Documents/com~apple~CloudDocs/icePlatformData/ice_platform.db
+Database Path: /Users/wangbo/Library/Mobile Documents/com~apple~CloudDocs/icePlatformData/ice_platform.db
+⏩ 工作流数据已存在，跳过。
+⏩ 机器人专属会话已存在，跳过。
+INFO:     127.0.0.1:58142 - "GET /api/v1/menus/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58143 - "GET /api/v1/todos/all HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [42082]

@@ -1,0 +1,31 @@
+/* src/themes/theme-meltdown.css */
+:root {
+    --theme-name: "Core Meltdown";
+    --bg-color-deep-space: #121212;
+    --bg-color-panel: #1e1e1e;
+    --primary-accent-color: #fb923c;
+    --secondary-accent-color: #facc15;
+    --border-color-tech: rgba(251, 146, 60, 0.3);
+    --text-color-primary: #e5e7eb;
+    --text-color-secondary: #9ca3af;
+    --text-color-header: #f9fafb;
+    --primary-accent-color-rgb: 251, 146, 60;
+    --card-bg-color: rgba(23, 42, 69, 0.8); /* 深色半透明 */
+    --code-bg-color: #0a192f;               /* 代码区域深底色 */
+}
+/* === Meltdown Theme: TodoList Overrides === */
+:root .todo-item.done .todo-text {
+    color: #facc15; /* 使用次强调色 (警告黄) 标记已完成 */
+}
+
+:root .todo-item:hover {
+    background-color: rgba(251, 146, 60, 0.15); /* 使用主强调色 (炽热橙) 的淡淡背景 */
+}
+
+:root .el-calendar-table .el-calendar-day:hover {
+    background-color: rgba(251, 146, 60, 0.2);
+}
+
+:root .el-calendar__header {
+    border-bottom-color: var(--border-color-tech);
+}

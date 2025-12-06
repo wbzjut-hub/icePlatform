@@ -1,0 +1,23 @@
+# Backend
+__pycache__/
+*.py[cod]
+venv/
+.env
+backend/bin/
+backend.log
+backend/error.log
+backend_debug.log
+
+# Frontend
+node_modules/
+dist/
+dist_electron/
+frontend.log
+
+# System
+.DS_Store
+.idea/
+.vscode/
+
+# Database (Optional, depending if user wants to sync DB)
+ice_platform.db

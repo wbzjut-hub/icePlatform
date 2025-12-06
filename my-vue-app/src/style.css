@@ -1,0 +1,111 @@
+/* Global Styles & Variables */
+:root {
+  /* Color Palette - Deep Space Theme (Default) */
+  --bg-color-deep-space: #0a192f;
+  --bg-color-panel: #112240;
+  --card-bg-color: #112240;
+  --text-color-primary: #e6f1ff;
+  --text-color-secondary: #8892b0;
+  --text-color-header: #ccd6f6;
+  --primary-accent-color: #64ffda;
+  --primary-accent-color-rgb: 100, 255, 218;
+  --secondary-accent-color: #ef4444;
+  --border-color-tech: rgba(100, 255, 218, 0.1);
+  --success-color: #64ffda;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+
+  /* Element Plus Overrides */
+  --el-bg-color: var(--bg-color-panel);
+  --el-bg-color-page: var(--bg-color-deep-space);
+  --el-bg-color-overlay: var(--bg-color-panel);
+  --el-border-color: var(--border-color-tech);
+  --el-text-color-primary: var(--text-color-primary);
+  --el-text-color-regular: var(--text-color-secondary);
+  --el-color-primary: var(--primary-accent-color);
+  --el-fill-color-blank: transparent;
+}
+
+/* Reset & Base */
+html,
+body,
+#app {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  /* Prevent global scrollbar */
+  font-family: "JetBrains Mono", Consolas, monospace;
+  background-color: var(--bg-color-deep-space);
+  color: var(--text-color-primary);
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  z-index: 0;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 255, 218, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 255, 218, 0.4);
+}
+
+/* Element Plus Overrides */
+.el-dialog {
+  background-color: var(--bg-color-panel) !important;
+  border: 1px solid var(--border-color-tech);
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+}
+
+.el-dialog__title {
+  color: var(--text-color-header);
+}
+
+.el-dialog__body {
+  color: var(--text-color-primary);
+}
+
+.el-button--primary {
+  --el-button-text-color: #0a192f;
+  font-weight: bold;
+}
+
+.el-button--success.is-plain {
+  --el-button-text-color: var(--primary-accent-color);
+  --el-button-hover-text-color: #0a192f;
+}
+
+.el-button--danger.is-plain {
+  --el-button-text-color: var(--secondary-accent-color);
+}
+
+/* Transitions */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}

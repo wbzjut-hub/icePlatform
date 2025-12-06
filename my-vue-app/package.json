@@ -1,0 +1,84 @@
+{
+  "name": "ice-platform",
+  "private": true,
+  "version": "1.0.0",
+  "description": "A full-stack AI platform with Python backend",
+  "author": "Your Name",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview",
+    "electron:build": "vue-tsc && vite build && electron-builder"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
+    "@types/markdown-it": "^14.1.2",
+    "axios": "^1.7.0",
+    "dayjs": "^1.11.10",
+    "electron-log": "^5.4.3",
+    "electron-updater": "^6.6.2",
+    "element-plus": "^2.7.0",
+    "highlight.js": "^11.11.1",
+    "markdown-it": "^14.1.0",
+    "pinia": "^2.1.7",
+    "vue": "^3.4.0",
+    "vue-router": "^4.3.0",
+    "vue3-lottie": "^3.3.1",
+    "vuedraggable": "^4.1.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.0",
+    "@vue/tsconfig": "^0.8.1",
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.0",
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0",
+    "vue-tsc": "^2.0.0"
+  },
+  "build": {
+    "appId": "com.iceplatform.app",
+    "productName": "IcePlatform",
+    "copyright": "Copyright © 2025",
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ]
+    },
+    "directories": {
+      "output": "dist_electron"
+    },
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://gitee.com/Tramisu_001/ice-platform/raw/master/release/"
+      }
+    ],
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../backend/dist/icePlatform",
+        "to": "icePlatform"
+      },
+      {
+        "from": "../backend/.env",
+        "to": ".env"
+      }
+    ]
+  }
+}

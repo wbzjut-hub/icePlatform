@@ -1,0 +1,29 @@
+:root {
+    --theme-name: "Stardust Light";
+
+    /* --- 背景色 --- */
+    --bg-color-deep-space: #faf5ff; /* 极淡的紫色 */
+    --bg-color-panel: #ffffff;
+
+    /* --- 强调色 --- */
+    --primary-accent-color: #9333ea; /* 深紫色 */
+    --secondary-accent-color: #0d9488; /* 深青色 */
+    --primary-accent-color-rgb: 147, 51, 234;
+
+    /* --- 边框 --- */
+    --border-color-tech: #e9d5ff;
+
+    /* --- 文字颜色 --- */
+    --text-color-primary: #1c1917;
+    --text-color-secondary: #57534e;
+    --text-color-header: #1c1917;
+
+    --card-bg-color: rgba(255, 255, 255, 0.85); /* 白色半透明 */
+    --code-bg-color: #f1f5f9;                   /* 代码区域浅灰底色 */
+}
+
+/* === 待办清单适配 === */
+:root .todo-item.done .todo-text { color: #a8a29e; }
+:root .todo-item:hover { background-color: #f3e8ff; }
+:root .el-calendar-table .el-calendar-day:hover { background-color: #f3e8ff; }
+:root .el-calendar__header { border-bottom-color: var(--border-color-tech); }

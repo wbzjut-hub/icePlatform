@@ -1,0 +1,29 @@
+:root {
+    --theme-name: "Meltdown Light";
+
+    /* --- 背景色 --- */
+    --bg-color-deep-space: #fff7ed; /* 极淡的橙色 */
+    --bg-color-panel: #ffffff;
+
+    /* --- 强调色 --- */
+    --primary-accent-color: #ea580c; /* 深橙色 */
+    --secondary-accent-color: #ca8a04; /* 深黄色 */
+    --primary-accent-color-rgb: 234, 88, 12;
+
+    /* --- 边框 --- */
+    --border-color-tech: #fed7aa;
+
+    /* --- 文字颜色 --- */
+    --text-color-primary: #18181b;
+    --text-color-secondary: #52525b;
+    --text-color-header: #18181b;
+
+    --card-bg-color: rgba(255, 255, 255, 0.85); /* 白色半透明 */
+    --code-bg-color: #f1f5f9;                   /* 代码区域浅灰底色 */
+}
+
+/* === 待办清单适配 === */
+:root .todo-item.done .todo-text { color: #a1a1aa; }
+:root .todo-item:hover { background-color: #ffedd5; }
+:root .el-calendar-table .el-calendar-day:hover { background-color: #ffedd5; }
+:root .el-calendar__header { border-bottom-color: var(--border-color-tech); }

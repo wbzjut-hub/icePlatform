@@ -1,0 +1,29 @@
+/* src/themes/theme-oceanic.css */
+:root {
+    --theme-name: "Oceanic Abyss";
+    --bg-color-deep-space: #0b1a30;
+    --bg-color-panel: #1f2937;
+    --primary-accent-color: #38bdf8;
+    --secondary-accent-color: #818cf8;
+    --border-color-tech: rgba(56, 189, 248, 0.3);
+    --text-color-primary: #e5e7eb;
+    --text-color-secondary: #9ca3af;
+    --text-color-header: #f9fafb;
+    --primary-accent-color-rgb: 56, 189, 248;
+}
+/* === Oceanic Theme: TodoList Overrides === */
+:root .todo-item.done .todo-text {
+    color: #818cf8; /* 使用次强调色 (靛蓝) 标记已完成 */
+}
+
+:root .todo-item:hover {
+    background-color: rgba(56, 189, 248, 0.15); /* 使用主强调色 (天蓝) 的淡淡背景 */
+}
+
+:root .el-calendar-table .el-calendar-day:hover {
+    background-color: rgba(56, 189, 248, 0.2);
+}
+
+:root .el-calendar__header {
+    border-bottom-color: var(--border-color-tech);
+}

@@ -1,0 +1,29 @@
+/* src/themes/theme-stardust.css */
+:root {
+    --theme-name: "Stardust Violet";
+    --bg-color-deep-space: #1a1b26;
+    --bg-color-panel: #2e2f3d;
+    --primary-accent-color: #c084fc;
+    --secondary-accent-color: #2dd4bf;
+    --border-color-tech: rgba(192, 132, 252, 0.3);
+    --text-color-primary: #e5e7eb;
+    --text-color-secondary: #9ca3af;
+    --text-color-header: #f9fafb;
+    --primary-accent-color-rgb: 192, 132, 252;
+}
+/* === Stardust Theme: TodoList Overrides === */
+:root .todo-item.done .todo-text {
+    color: #2dd4bf; /* 使用次强调色 (青色) 标记已完成 */
+}
+
+:root .todo-item:hover {
+    background-color: rgba(192, 132, 252, 0.15); /* 使用主强调色 (薰衣草紫) 的淡淡背景 */
+}
+
+:root .el-calendar-table .el-calendar-day:hover {
+    background-color: rgba(192, 132, 252, 0.2);
+}
+
+:root .el-calendar__header {
+    border-bottom-color: var(--border-color-tech);
+}
