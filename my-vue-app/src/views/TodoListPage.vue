@@ -215,6 +215,15 @@ onMounted(() => {
     //   appStore.setBriefingGenerated()
     // }, 1000)
   }
+
+  // Listen for refresh requests (e.g. from Bubble)
+  if ((window as any).require) {
+      const { ipcRenderer } = (window as any).require('electron')
+      ipcRenderer.on('refresh-todos', () => {
+          console.log('Received refresh-todos signal')
+          if (fetchTodos) fetchTodos()
+      })
+  }
 })
 </script>
 
@@ -343,7 +352,7 @@ onMounted(() => {
   flex: 1;
   gap: 24px;
   min-height: 0;
-  overflow: hidden;
+  overflow: hidden; /* No scroll, adapt to width */
 }
 
 /* Calendar Overrides */

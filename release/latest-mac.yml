@@ -1,0 +1,11 @@
+version: 1.0.0
+files:
+  - url: IcePlatform-1.0.0-arm64-mac.zip
+    sha512: l/NXFbR3s7mxeCq1HWbhBw8vhJQDNKyRZeB7lpajpQKgaKQCJpJxvqXBTY2M3H+osJSo9PYNHGSrNUUFimGQvw==
+    size: 181281347
+  - url: IcePlatform-1.0.0-arm64.dmg
+    sha512: YM20cyk53K/qTMlLxQevXdYkGltZ5gpYgcBgDLJguUNhMdiN2rE65LVIPoxtpFvWxFe7XNjNHtuKUeRgZTS1PA==
+    size: 187642320
+path: IcePlatform-1.0.0-arm64-mac.zip
+sha512: l/NXFbR3s7mxeCq1HWbhBw8vhJQDNKyRZeB7lpajpQKgaKQCJpJxvqXBTY2M3H+osJSo9PYNHGSrNUUFimGQvw==
+releaseDate: '2025-12-06T16:30:26.021Z'

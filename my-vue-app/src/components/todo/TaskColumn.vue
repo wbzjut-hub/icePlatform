@@ -131,6 +131,7 @@ const cancelEditing = () => {
   padding: 15px;
   height: 100%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  min-width: 0; /* Critical: Allow flex item to shrink below content size */
 }
 
 .column-header {

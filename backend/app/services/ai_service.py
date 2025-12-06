@@ -106,6 +106,7 @@ class AIService:
         # 定义默认返回值
         usage_data = None
         reply_text = ""
+        executed_actions = []  # 🌟 追踪执行的动作
 
         # 6. 执行推理
         try:
@@ -127,7 +128,11 @@ class AIService:
 
                     selected_tool = tool_registry.get(tool_name)
                     if selected_tool:
-                        tool_output = selected_tool.invoke(tool_args)
+                        try:
+                            tool_output = selected_tool.invoke(tool_args)
+                            executed_actions.append(tool_name)  # 记录成功调用的工具
+                        except Exception as tool_err:
+                            tool_output = f"Error executing {tool_name}: {tool_err}"
                     else:
                         tool_output = f"Error: Tool '{tool_name}' not allowed."
 
@@ -149,7 +154,8 @@ class AIService:
 
         return {
             "reply": reply_text,
-            "usage": usage_data
+            "usage": usage_data,
+            "actions": executed_actions # 🌟 返回动作列表
         }
 
 

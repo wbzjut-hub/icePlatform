@@ -32,6 +32,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/Login.vue')
     },
     {
+        path: '/bubble',
+        name: 'Bubble',
+        component: () => import('@/views/BubblePage.vue')
+    },
+    {
         path: '/',
         name: 'Layout',
         component: () => import('@/views/Layout.vue'),

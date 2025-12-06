@@ -56,7 +56,7 @@
  [],
  False,
  False,
- 1765029112,
+ 1765044348,
  [('run',
    '/Users/wangbo/Desktop/Object/aiTalking/backend/venv/lib/python3.9/site-packages/PyInstaller/bootloader/Darwin-64bit/run',
    'EXECUTABLE')],

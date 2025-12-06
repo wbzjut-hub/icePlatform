@@ -113,6 +113,7 @@ async def chat_endpoint(request: ChatRequest, db: Session = Depends(get_db)):
 
     reply_text = result["reply"]
     token_usage = result.get("usage")  # 🌟 获取 usage
+    actions = result.get("actions", []) # 🌟 获取 actions
 
     # 4. 保存 AI 回复 (带 usage)
     ai_msg = ChatMessage(session_id=session_id, role="assistant", content=reply_text, usage=token_usage)
@@ -123,5 +124,6 @@ async def chat_endpoint(request: ChatRequest, db: Session = Depends(get_db)):
         "session_id": session_id,
         "reply": reply_text,
         "session_title": db.query(ChatSession).get(session_id).title,
-        "usage": token_usage  # 🌟 返回给前端
+        "usage": token_usage,
+        "actions": actions # 🌟 返回给前端
     }

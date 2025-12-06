@@ -40,7 +40,8 @@
               <el-dropdown-item :icon="FolderOpened" @click="$emit('change-db-path')" divided>更改存储路径</el-dropdown-item>
               <el-dropdown-item :icon="Monitor" @click="$emit('toggle-devtools')" divided>调试控制台</el-dropdown-item>
               <!-- Auto Update -->
-              <el-dropdown-item :icon="Refresh" @click="handleCheckUpdate" divided>检查更新</el-dropdown-item>
+              <!-- Auto Update -->
+              <el-dropdown-item :icon="Refresh" @click="handleManualUpdate" divided>手动更新</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -68,7 +69,7 @@ import {
 import { ElMessageBox, ElMessage, ElNotification } from 'element-plus'
 import { useTheme, type ThemeName } from '@/hooks/useTheme'
 // Simple fetch for health check, bypassing axios interceptors to avoid auth redirect loops if needed
-const API_BASE = import.meta.env.PROD ? 'http://127.0.0.1:8000' : '/api'
+const API_BASE = import.meta.env.PROD ? 'http://127.0.0.1:8000/api' : '/api'
 
 // Electron IPC
 const ipcRenderer = (window as any).require ? (window as any).require('electron').ipcRenderer : null
@@ -117,63 +118,35 @@ const startPolling = (interval: number) => {
 
 onMounted(() => {
   checkHealth()
+})
 
-  // Setup Update Listeners
-  if (ipcRenderer) {
-    ipcRenderer.on('update-message', (_event: any, data: any) => {
-      console.log('Update Message:', data)
-      switch (data.type) {
-        case 'checking':
-          ElMessage.info('正在检查更新...')
-          break
-        case 'available':
-          ElMessageBox.confirm(`发现新版本 ${data.info.version}，是否立即下载？`, '发现更新', {
-            confirmButtonText: '立即更新',
-            cancelButtonText: '稍后',
-            type: 'info'
-          }).then(() => {
-            ipcRenderer.send('download-update')
-          }).catch(() => {})
-          break
-        case 'not-available':
-          ElMessage.success('当前已是最新版本')
-          break
-        case 'error':
-          ElMessage.error(`更新检查失败: ${data.error}`)
-          break
-        case 'progress':
-          // Optional: Show progress bar notification
-          // For simplicity, just log or show non-intrusive message
-          // ElMessage.info(`下载进度: ${Math.round(data.progress.percent)}%`)
-          break
-        case 'downloaded':
-          ElMessageBox.confirm('更新已下载完毕，是否立即重启安装？', '更新就绪', {
-            confirmButtonText: '立即重启',
-            cancelButtonText: '稍后',
-            type: 'success'
-          }).then(() => {
-            ipcRenderer.send('quit-and-install')
-          }).catch(() => {})
-          break
+// Manual Update Handler
+const handleManualUpdate = async () => {
+    if (!ipcRenderer) {
+      ElMessage.warning('Web 模式不支持更新，请在客户端中使用')
+      return
+    }
+
+    try {
+      const result = await ipcRenderer.invoke('manual-update')
+      if (result.success) {
+        ElMessageBox.alert(
+          '安装程序已启动。请按照提示完成安装。\n应用将自动退出以释放资源。',
+          '准备更新',
+          {
+            confirmButtonText: '退出应用',
+            type: 'success',
+            callback: () => {
+              ipcRenderer.send('quit-app')
+            }
+          }
+        )
       }
-    })
+    } catch (e) {
+      console.error(e)
+      ElMessage.error('启动更新失败')
+    }
   }
-})
-
-onUnmounted(() => {
-  if (pollTimer) clearTimeout(pollTimer)
-  if (ipcRenderer) {
-    ipcRenderer.removeAllListeners('update-message')
-  }
-})
-
-const handleCheckUpdate = () => {
-  if (ipcRenderer) {
-    ipcRenderer.send('check-for-update')
-  } else {
-    ElMessage.warning('Web 模式不支持自动更新，请在客户端中使用')
-  }
-}
 
 const emit = defineEmits<{
   (e: 'open-settings'): void

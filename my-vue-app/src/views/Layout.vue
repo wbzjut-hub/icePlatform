@@ -97,6 +97,18 @@ const handleDeletePage = async (itemToDelete: MenuItem) => {
     if (typeof redirectPath === 'string') await router.push(redirectPath)
   }
 }
+
+// IPC Navigation Listener
+import { onMounted } from 'vue' // Ensure onMounted is imported from 'vue' above
+onMounted(() => {
+  if ((window as any).require) {
+    const { ipcRenderer } = (window as any).require('electron')
+    ipcRenderer.on('navigate-to', (event: any, path: string) => {
+      console.log('IPC Navigate to:', path)
+      router.push(path)
+    })
+  }
+})
 </script>
 
 <style scoped>

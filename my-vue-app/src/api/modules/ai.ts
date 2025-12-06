@@ -29,6 +29,8 @@ export interface ChatResponse {
         completion_tokens: number;
         total_tokens: number;
     };
+    // 🌟 新增 actions (执行的工具列表)
+    actions?: string[];
 }
 
 export interface Workflow {

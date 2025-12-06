@@ -4,6 +4,10 @@
   "version": "1.0.0",
   "description": "A full-stack AI platform with Python backend",
   "author": "Your Name",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wbzjut-hub/icePlatform.git"
+  },
   "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
@@ -62,8 +66,9 @@
     },
     "publish": [
       {
-        "provider": "generic",
-        "url": "https://gitee.com/Tramisu_001/ice-platform/raw/master/release/"
+        "provider": "github",
+        "owner": "wbzjut-hub",
+        "repo": "icePlatform"
       }
     ],
     "files": [
