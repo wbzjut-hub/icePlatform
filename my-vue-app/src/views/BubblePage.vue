@@ -200,7 +200,7 @@ onMounted(() => {
     })
     
     // Listen for Dock Side Change
-    ipcRenderer.on('dock-side-changed', (event, side) => {
+    ipcRenderer.on('dock-side-changed', (event: any, side: string) => {
         if (side === 'none') {
             isDocked.value = false
         } else {

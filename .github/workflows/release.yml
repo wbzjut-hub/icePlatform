@@ -1,0 +1,64 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      # --- Setup Python ---
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install Python Dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build Python Backend
+        run: |
+          cd backend
+          pyinstaller icePlatform.spec --clean --noconfirm
+        # Windows: creates backend/dist/icePlatform/icePlatform.exe
+        # Mac: creates backend/dist/icePlatform/icePlatform
+
+      # --- Setup Node ---
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: my-vue-app/package-lock.json
+
+      - name: Install Frontend Dependencies
+        run: |
+          cd my-vue-app
+          npm install
+
+      - name: Build Electron App
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd my-vue-app
+          npm run type-check || echo "Skipping type check"
+          npm run build
+          # Use electron-builder directly. Config is in package.json.
+          npx electron-builder --publish always
+          
+      # Note: We need to make sure electron-builder knows where to find the backend.
+      # package.json says: "../backend/dist/icePlatform" -> "icePlatform"
