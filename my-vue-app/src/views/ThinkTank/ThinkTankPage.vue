@@ -392,9 +392,13 @@ const sendMessage = async () => {
     streamingContent.value = ''
     const sessionId = `thinktank_${activeExpert.value.id}`
     
+    // 🌟 Fix: Use full URL in production (Electron), relative in Dev (Vite proxy)
+    const isProduction = import.meta.env.PROD
+    const baseURL = isProduction ? 'http://127.0.0.1:8008/api/v1' : '/api/v1'
+    
     try {
         // Use streaming endpoint
-        const response = await fetch('/api/v1/ai/chat/stream', {
+        const response = await fetch(`${baseURL}/ai/chat/stream`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
