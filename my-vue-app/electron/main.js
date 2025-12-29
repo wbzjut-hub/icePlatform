@@ -16,7 +16,9 @@ const createPyProc = () => {
         // 生产环境：指向打包在资源目录下的 icePlatform 文件夹中的可执行文件
         // 原来的 OneFile 模式由于需要解压，启动很慢。改为 OneDir 模式后，路径多了一层文件夹。
         // Resources/icePlatform/icePlatform
-        script = path.join(process.resourcesPath, 'icePlatform', 'icePlatform')
+        const execName = process.platform === 'win32' ? 'icePlatform.exe' : 'icePlatform'
+        script = path.join(process.resourcesPath, 'icePlatform', execName)
+
         if (process.platform !== 'win32') {
             try {
                 fs.chmodSync(script, 0o755);

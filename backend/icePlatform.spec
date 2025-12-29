@@ -1,5 +1,8 @@
-# -*- mode: python ; coding: utf-8 -*-
+import platform
 
+system_platform = platform.system()
+ffmpeg_binary = 'bin/ffmpeg.exe' if system_platform == 'Windows' else 'bin/ffmpeg'
+ffmpeg_target = 'bin/ffmpeg.exe' if system_platform == 'Windows' else 'bin/ffmpeg'
 
 a = Analysis(
     ['main.py'],
@@ -7,6 +10,7 @@ a = Analysis(
     binaries=[],
     datas=[
         ('models', 'whisper_models'), # Copy backend/models to dist/whisper_models
+        ('.env', '.'), # Ensure .env is included
     ],
     hiddenimports=['whisper'],
     hookspath=[],
@@ -37,7 +41,7 @@ exe = EXE(
 )
 coll = COLLECT(
     exe,
-    a.binaries + [('bin/ffmpeg', 'bin/ffmpeg', 'BINARY')], # Use local bin/ffmpeg, put in bin/ folder
+    a.binaries + [(ffmpeg_binary, ffmpeg_target, 'BINARY')], # Dynamic ffmpeg binary
     a.datas,
     strip=False,
     upx=True,
