@@ -9,7 +9,7 @@ backend_debug.log
 backend/build/
 backend/dist/
 backend/bin/
-backend/models/
+backend/bin/
 release/
 
 # Frontend
