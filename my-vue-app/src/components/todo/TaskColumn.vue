@@ -8,6 +8,7 @@
         @keyup.enter="handleAddItem" 
         size="small" 
       />
+      <div class="input-hint">用 @人名 指定相关人</div>
     </div>
     
     <draggable 
@@ -24,10 +25,15 @@
           <el-checkbox :model-value="item.done" @change="$emit('toggle', item.id)" />
           
           <span 
+            class="item-text" 
             v-if="editingId !== item.id" 
-            @dblclick="startEditing(item)" 
-            class="item-text"
-          >{{ item.text }}</span>
+            @dblclick="startEditing(item)"
+          >
+            {{ getDisplayText(item.text) }}
+            <span v-if="getAssignees(item.text).length > 0" class="assignee-suffix">
+              ({{ getAssignees(item.text).join(', ') }})
+            </span>
+          </span>
           
           <el-input 
             v-else 
@@ -69,6 +75,7 @@ interface TaskItem {
   id: string
   text: string
   done: boolean
+  assignees?: string[]
 }
 
 const props = defineProps<{
@@ -92,6 +99,18 @@ const editingText = ref('')
 const inputRefs = ref<Record<string, any>>({})
 
 const setInputRef = (el: any, id: string) => { if (el) inputRefs.value[id] = el }
+
+// 从文本中提取 @人名 列表
+const getAssignees = (text: string): string[] => {
+  const matches = text.match(/@(\S+)/g)
+  if (!matches) return []
+  return matches.map(m => m.substring(1))
+}
+
+// 获取不包含 @人名 的显示文本
+const getDisplayText = (text: string): string => {
+  return text.replace(/@\S+/g, '').trim()
+}
 
 const handleAddItem = () => {
   if (newItemText.value.trim()) {
@@ -131,7 +150,7 @@ const cancelEditing = () => {
   padding: 15px;
   height: 100%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  min-width: 0; /* Critical: Allow flex item to shrink below content size */
+  min-width: 0;
 }
 
 .column-header {
@@ -145,13 +164,20 @@ const cancelEditing = () => {
   text-shadow: 0 0 5px rgba(100, 255, 218, 0.3);
 }
 
+.input-hint {
+  font-size: 11px;
+  color: var(--text-color-secondary);
+  opacity: 0.6;
+  margin-top: 5px;
+}
+
 .item-list {
   flex: 1;
   overflow-y: auto;
   padding-right: 5px;
   min-height: 0;
 }
-/* Scrollbar specific for item list */
+
 .item-list::-webkit-scrollbar { width: 4px; }
 .item-list::-webkit-scrollbar-thumb { background: rgba(100,255,218,0.1); }
 
@@ -172,12 +198,25 @@ const cancelEditing = () => {
   transform: translateX(2px);
 }
 
+.item-content {
+  flex-grow: 1;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
 .item-text {
   flex-grow: 1;
   margin: 0 10px;
   color: var(--text-color-primary);
   cursor: pointer;
   font-size: 14px;
+}
+
+.assignee-suffix {
+  color: var(--text-color-secondary);
+  font-size: 12px;
+  margin-left: 6px;
+  opacity: 0.7;
 }
 
 .drag-handle {
@@ -194,6 +233,10 @@ const cancelEditing = () => {
   opacity: 0.6;
 }
 
+.task-item.done .assignee-tag {
+  opacity: 0.5;
+}
+
 .task-item.done :deep(.el-checkbox__inner) {
   background-color: var(--primary-accent-color);
   border-color: var(--primary-accent-color);
@@ -207,7 +250,6 @@ const cancelEditing = () => {
   margin: 0 10px;
 }
 
-/* Deep customize Element Plus Input to match theme */
 :deep(.el-input__wrapper) {
   background-color: rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 0 1px var(--border-color-tech) inset;

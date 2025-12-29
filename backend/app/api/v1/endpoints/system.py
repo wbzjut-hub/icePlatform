@@ -20,6 +20,7 @@ class PathRequest(BaseModel):
 class SettingsDto(BaseModel):
     openai_api_key: Optional[str] = None
     openai_base_url: Optional[str] = None
+    tavily_api_key: Optional[str] = None
 
 
 # --- 原有功能: 数据库路径管理 ---
@@ -61,14 +62,21 @@ def move_db(req: PathRequest):
 @router.get("/settings")
 def get_settings(db: Session = Depends(get_db)):
     """获取系统设置 (API Key, Base URL)"""
-    target_keys = ["openai_api_key", "openai_base_url"]
+    target_keys = ["openai_api_key", "openai_base_url", "tavily_api_key"]
     result = {}
 
     for k in target_keys:
         # 从数据库查询配置项
         setting = db.query(SystemSetting).filter(SystemSetting.key == k).first()
-        # 如果数据库里有值就返回，没有则返回空字符串，方便前端绑定
-        result[k] = setting.value if setting else ""
+        
+        if setting:
+            result[k] = setting.value
+        else:
+            # 数据库没有时，回退到配置文件/环境变量的默认值
+            # settings.OPENAI_API_KEY, settings.TAVILY_API_KEY 等
+            # 将 key 转为大写 (openai_api_key -> OPENAI_API_KEY)
+            default_val = getattr(settings, k.upper(), "")
+            result[k] = default_val
 
     return result
 
@@ -79,7 +87,8 @@ def save_settings(data: SettingsDto, db: Session = Depends(get_db)):
     # 准备要更新的数据
     updates = {
         "openai_api_key": data.openai_api_key,
-        "openai_base_url": data.openai_base_url
+        "openai_base_url": data.openai_base_url,
+        "tavily_api_key": data.tavily_api_key
     }
 
     try:

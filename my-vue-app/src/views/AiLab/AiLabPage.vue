@@ -162,7 +162,7 @@ import 'highlight.js/styles/atom-one-dark.css'
 // 🌟 语音模块引入
 // 即使搁置功能，只要文件存在，import 就不会报错，打包也正常
 import { useAudioRecorder } from '@/hooks/useAudioRecorder'
-import { transcribeAudioApi } from '@/api/modules/voice'
+import { voiceApi } from '@/api/modules/voice'
 
 // ==========================================
 // 🛠️ 功能开关：是否启用语音交互
@@ -227,9 +227,11 @@ const handleKeyUp = async (e: KeyboardEvent) => {
 
     loading.value = true
     try {
-      const res = await transcribeAudioApi(audioBlob)
-      if (res && res.text) {
-        userInput.value = res.text
+      // Need File object for API
+      const file = new File([audioBlob], "voice_input.wav", { type: "audio/wav" })
+      const res = await voiceApi.transcribe(file)
+      if (res && res.data && res.data.text) {
+        userInput.value = res.data.text
         await sendMessage()
       } else {
         ElMessage.warning('未检测到语音')

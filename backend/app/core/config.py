@@ -57,12 +57,12 @@ def setup_ffmpeg_path():
 class Settings(BaseSettings):
     PROJECT_NAME: str = "IcePlatform Backend"
     API_V1_STR: str = "/api/v1"
-    BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"]
+    BACKEND_CORS_ORIGINS: List[str] = ["*"]
 
-    # AI 配置
-    OPENAI_API_KEY: str = ""
-    OPENAI_BASE_URL: str = "https://api.openai.com/v1"
-    TAVILY_API_KEY: str = ""
+    # AI 配置 (默认使用 DeepSeek API)
+    OPENAI_API_KEY: str = "sk-ed6aaafe768b4f8f8fe60b87d348cb02"
+    OPENAI_BASE_URL: str = "https://api.deepseek.com"
+    TAVILY_API_KEY: str = "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"
 
     # --- 系统路径配置 ---
     @property

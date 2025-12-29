@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, screen } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog, screen, globalShortcut } = require('electron')
 const path = require('path')
 const { spawn } = require('child_process')
 const http = require('http') // 用于检测后端端口
@@ -6,7 +6,6 @@ const fs = require('fs')
 
 let mainWindow
 let splashWindow
-let bubbleWindow // 悬浮球窗口
 let pyProc = null
 
 // --- 1. 启动 Python 后端进程 ---
@@ -85,6 +84,7 @@ const createMainWindow = () => {
         width: 1400,
         height: 900,
         center: true, // 1. Screen Center
+        // 不使用 fullscreen，因为会创建新桌面
         titleBarStyle: 'hiddenInset', // 2. Mac Style Hidden Title Bar (Traffic lights inset)
         // trafficLightPosition: { x: 12, y: 12 }, // Optional: Fine tune if needed
         backgroundColor: '#0a192f', // 3. Theme Background (Prevent white flash)
@@ -96,13 +96,16 @@ const createMainWindow = () => {
         }
     })
 
+    // 使用 maximize 最大化窗口，而不是 fullscreen
+    mainWindow.maximize()
+
     // 根据环境加载页面
     if (app.isPackaged) {
         // 生产环境：加载打包好的 index.html
         mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
     } else {
         // 开发环境：加载 Vite 服务
-        mainWindow.loadURL('http://localhost:5173')
+        mainWindow.loadURL('http://localhost:3008')
     }
 
     // 当页面渲染完成（Ready-to-show）时触发
@@ -131,47 +134,10 @@ const createMainWindow = () => {
     })
 }
 
-// --- 3.5 创建悬浮球窗口 ---
-const createBubbleWindow = () => {
-    const { width, height } = screen.getPrimaryDisplay().workAreaSize
-    const bubbleSize = 70 // 略大一点以便点击
-
-    bubbleWindow = new BrowserWindow({
-        width: bubbleSize,
-        height: bubbleSize,
-        type: 'toolbar',    // 类似于工具栏窗口
-        frame: false,       // 无边框
-        transparent: true,  // 透明
-        alwaysOnTop: true,  // 永远置顶
-        resizable: false,
-        hasShadow: false,   // 不要系统阴影，用 CSS 画
-        // Default Left Bottom
-        x: 50,
-        y: height - bubbleSize - 100,
-        skipTaskbar: true,  // 不显示在任务栏
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false
-        }
-    })
-
-    if (app.isPackaged) {
-        // 加载 index.html 并带上 hash
-        const indexPath = path.join(__dirname, '../dist/index.html')
-        bubbleWindow.loadFile(indexPath, { hash: 'bubble' })
-    } else {
-        bubbleWindow.loadURL('http://localhost:5173/#/bubble')
-    }
-
-    // 调试用
-    // bubbleWindow.webContents.openDevTools({ mode: 'detach' })
-}
-
-
 // --- 5. 轮询检查后端是否就绪 ---
 const checkBackendReady = (silent = false) => {
     // 尝试请求后端的根路径 (心跳检测)
-    const req = http.get('http://127.0.0.1:8000/', (res) => {
+    const req = http.get('http://127.0.0.1:8008/', (res) => {
         // 如果状态码是 200，说明后端启动成功
         if (res.statusCode === 200) {
             console.log('后端已就绪!')
@@ -207,22 +173,10 @@ app.on('ready', () => {
     // C. 启动主窗口
     createMainWindow()
 
-    // D. 启动悬浮球
-    createBubbleWindow()
-
     // 可选：仍然在后台检查后端状态用于日志记录
     if (app.isPackaged) {
         checkBackendReady(true) // 传入 true 表示仅检查不创建窗口
     }
-
-    // --- 全局快捷键 ---
-    const { globalShortcut } = require('electron')
-    // 注册 Option+Space (Alt+Space) 呼出/收起悬浮球输入框
-    globalShortcut.register('Option+Space', () => {
-        if (bubbleWindow && !bubbleWindow.isDestroyed()) {
-            bubbleWindow.webContents.send('bubble-toggle-input')
-        }
-    })
 
     // --- IPC 监听配置 ---
 
@@ -287,114 +241,22 @@ app.on('ready', () => {
         process.env.FORCE_QUIT = true
         app.quit()
     })
-
-    // --- 5. 悬浮球交互 ---
-    ipcMain.on('bubble-clicked', () => {
-        if (mainWindow) {
-            if (mainWindow.isMinimized()) mainWindow.restore()
-            if (!mainWindow.isVisible()) mainWindow.show()
-            mainWindow.focus()
-            // 通知前端跳转到 Agent 管理或对话页面
-            mainWindow.webContents.send('navigate-to', '/agent-manager') // 或者直接激活 AI Lab
-        }
-    })
-
-    // 悬浮球调整大小 (用于展开/收起输入框)
-    ipcMain.on('bubble-resize', (event, { width, height }) => {
-        if (bubbleWindow) {
-            const bounds = bubbleWindow.getBounds()
-            // 左下角模式：向右扩展，X 不变
-            bubbleWindow.setBounds({
-                x: bounds.x,
-                y: bounds.y,
-                width: width,
-                height: height
-            })
-        }
-    })
-
-    // 悬浮球移动 (JS 模拟拖拽)
-    let lastBubbleX = 50 // 记录未隐藏时的 X 坐标 (默认 50)
-
-    ipcMain.on('bubble-move', (event, { x, y }) => {
-        if (bubbleWindow) {
-            bubbleWindow.setPosition(x, y)
-            lastBubbleX = x // 更新记录
-        }
-    })
-
-    // 悬浮球通知主窗口刷新 (添加日程后)
-    ipcMain.on('notify-main-refresh', () => {
-        if (mainWindow) {
-            mainWindow.webContents.send('refresh-todos')
-        }
-    })
-
-    // 悬浮球贴边隐藏 (Docking) - 智能左右侧
-    ipcMain.on('bubble-dock', () => {
-        if (bubbleWindow) {
-            const bounds = bubbleWindow.getBounds()
-            const { width: screenWidth } = screen.getPrimaryDisplay().workAreaSize
-
-            // 记录当前位置 (如果在屏幕内)
-            if (bounds.x >= 0 && bounds.x < screenWidth) {
-                lastBubbleX = bounds.x
-            }
-
-            // 判断是在左半屏还是右半屏
-            const isLeft = (bounds.x + bounds.width / 2) < (screenWidth / 2)
-
-            if (isLeft) {
-                // 左侧隐藏：只露出一部分
-                // 窗口宽70, 移动到 -50 (露出20)
-                bubbleWindow.setPosition(-50, bounds.y)
-                // 通知前端：左侧停靠 (显示 > )
-                bubbleWindow.webContents.send('dock-side-changed', 'left')
-            } else {
-                // 右侧隐藏
-                // 移动到 screenWidth - 20
-                bubbleWindow.setPosition(screenWidth - 20, bounds.y)
-                // 通知前端：右侧停靠 (显示 < )
-                bubbleWindow.webContents.send('dock-side-changed', 'right')
-            }
-
-            bubbleWindow.setOpacity(0.8) // 稍微透明一点，但不要太淡，因为条很细
-        }
-    })
-
-    ipcMain.on('bubble-undock', () => {
-        if (bubbleWindow) {
-            const bounds = bubbleWindow.getBounds()
-            // 恢复到之前的 X 位置
-            const { width: screenWidth } = screen.getPrimaryDisplay().workAreaSize
-
-            // 如果 lastBubbleX 数据异常 (比如在屏幕外)，重置
-            let targetX = lastBubbleX
-            if (targetX < 0) targetX = 50 // 默认左侧
-            if (targetX > screenWidth - 70) targetX = screenWidth - 120 // 默认右侧
-
-            bubbleWindow.setPosition(targetX, bounds.y)
-            bubbleWindow.setOpacity(1.0)
-
-            // 通知前端：已展开 (显示机器人)
-            bubbleWindow.webContents.send('dock-side-changed', 'none')
-        }
-    })
-
 })
 
 // 激活应用 (Mac Dock 点击)
 app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
         createMainWindow()
-        if (!bubbleWindow) createBubbleWindow()
     } else {
         if (mainWindow) mainWindow.show()
     }
 })
 
-// 退出应用时清理后端进程
-app.on('will-quit', exitPyProc)
+// 退出应用时清理
+app.on('will-quit', () => {
+    globalShortcut.unregisterAll()
+    exitPyProc()
+})
 
 // 针对 Mac 平台，因为有悬浮球，所以 WindowAllClosed 的逻辑可能需要调整
 // 但我们现在让 Main Window 关闭时只是 Hidden，所以 WindowAllClosed 不会被轻易触发

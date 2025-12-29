@@ -1,41 +1,70 @@
+import whisper
 import os
+import sys
+import logging
+from typing import Optional
 
-os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
-
-from faster_whisper import WhisperModel
-from app.core.config import settings
-
+logger = logging.getLogger(__name__)
 
 class VoiceService:
-    def __init__(self):
-        self.model = None
-        # 模型存储在用户数据目录，避免每次打包导致应用体积过大
-        self.model_path = settings.APP_DATA_DIR / "models" / "whisper"
-        self.model_size = "base"  # 可选: tiny (最快), base (平衡), small (较准)
+    _model = None
 
-    def _load_model(self):
-        if not self.model:
-            print(f"正在加载 Whisper 模型 ({self.model_size})...")
-            # device="cpu" 保证兼容性，compute_type="int8" 保证速度
-            self.model = WhisperModel(
-                self.model_size,
-                device="cpu",
-                compute_type="int8",
-                download_root=str(self.model_path)
-            )
-            print("Whisper 模型加载完成")
+    @staticmethod
+    def _get_bundle_path():
+        """Get the absolute path to the resource, works for dev and for PyInstaller OneDir."""
+        if getattr(sys, 'frozen', False):
+            # In OneDir mode, resources are usually next to the executable
+            return os.path.dirname(sys.executable)
+        # Running in a normal Python environment
+        return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-    def transcribe(self, file_path: str) -> str:
-        self._load_model()
+    @classmethod
+    def get_model(cls):
+        if cls._model is None:
+            logger.info("Loading Whisper model 'tiny'...")
+            try:
+                # 1. Handle Model Path
+                bundle_path = cls._get_bundle_path()
+                
+                # In dev: let it download to default cache or customized path
+                # In prod: look in bundled temporary directory
+                download_root = None
+                if getattr(sys, 'frozen', False):
+                    download_root = os.path.join(bundle_path, 'whisper_models')
+                    logger.info(f"Frozen mode detected. Loading model from {download_root}")
+                
+                # 2. Handle FFmpeg Path
+                # If frozen, add the app's bin directory to PATH so subprocess can find ffmpeg
+                if getattr(sys, 'frozen', False):
+                    os.environ["PATH"] += os.pathsep + bundle_path
+                    logger.info(f"Added {bundle_path} to PATH for FFmpeg")
 
-        segments, info = self.model.transcribe(
-            file_path,
-            beam_size=5,
-            language="zh"  # 强制中文，或者去掉让它自动识别
-        )
+                # Load model
+                cls._model = whisper.load_model("tiny", download_root=download_root)
+                logger.info("Whisper model loaded successfully.")
+            except Exception as e:
+                logger.error(f"Failed to load Whisper model: {e}")
+                raise e
+        return cls._model
 
-        text = "".join([segment.text for segment in segments])
-        return text.strip()
+    @classmethod
+    def transcribe(cls, audio_path: str) -> str:
+        """
+        Transcribe audio file to text using local Whisper model.
+        """
+        if not os.path.exists(audio_path):
+            raise FileNotFoundError(f"Audio file not found: {audio_path}")
 
+        try:
+            model = cls.get_model()
+            # Initial prompt can help with context or language detection
+            # 强制指定中文 'zh'
+            result = model.transcribe(audio_path, fp16=False, language='zh') # fp16=False for wider compatibility
+            text = result.get("text", "").strip()
+            logger.info(f"Transcription result: {text}")
+            return text
+        except Exception as e:
+            logger.error(f"Transcription failed: {str(e)}")
+            raise e
 
 voice_service = VoiceService()

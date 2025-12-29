@@ -69,7 +69,7 @@ import {
 import { ElMessageBox, ElMessage, ElNotification } from 'element-plus'
 import { useTheme, type ThemeName } from '@/hooks/useTheme'
 // Simple fetch for health check, bypassing axios interceptors to avoid auth redirect loops if needed
-const API_BASE = import.meta.env.PROD ? 'http://127.0.0.1:8000/api' : '/api'
+const API_BASE = import.meta.env.PROD ? 'http://127.0.0.1:8008/api' : '/api'
 
 // Electron IPC
 const ipcRenderer = (window as any).require ? (window as any).require('electron').ipcRenderer : null

@@ -153,5 +153,13 @@ def root():
 
 if __name__ == "__main__":
     import uvicorn
+    import sys
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # 判断运行环境
+    if getattr(sys, 'frozen', False):
+        # 生产环境 (打包后): 不支持 reload，直接运行 app 对象
+        uvicorn.run(app, host="0.0.0.0", port=8008)
+    else:
+        # 开发环境: 开启热重载 (reload=True)
+        # 注意: reload 模式下必须传入 import string ("main:app") 而不是 app 对象
+        uvicorn.run("main:app", host="0.0.0.0", port=8008, reload=True)

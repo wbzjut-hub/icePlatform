@@ -73,4 +73,5 @@ export interface TodoItem {
     id: string;
     text: string;
     done: boolean;
+    assignees?: string[];  // 相关人列表（可选）
 }

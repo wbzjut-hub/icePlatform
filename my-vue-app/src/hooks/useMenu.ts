@@ -9,7 +9,11 @@ const defaultMenuItems: MenuItem[] = [
     { id: 'menu_todo_list', name: '待办清单', path: '/todo-list', icon: 'Calendar' },
     { id: 'menu_ai_lab', name: 'AI 实验室', path: '/ai-lab', icon: 'Cpu' },
     { id: 'menu_api_list', name: 'API列表', path: '/api-list', icon: 'Memo' },
-    { id: 'menu_agent_manager', name: '智能体中心', path: '/agent-manager', icon: 'Connection' }
+    { id: 'menu_agent_manager', name: '智能体中心', path: '/agent-manager', icon: 'Connection' },
+    { id: 'menu_think_tank', name: '智囊团中心', path: '/think-tank', icon: 'Reading' },
+    { id: 'menu_svg_renderer', name: 'SVG 实验室', path: '/svg-renderer', icon: 'Brush' },
+    { id: 'menu_debate', name: 'AI 辩论赛', path: '/debate', icon: 'ChatLineSquare' },
+    { id: 'menu_roundtable', name: '专家圆桌', path: '/roundtable', icon: 'OfficeBuilding' }
 ]
 
 export function useMenu() {

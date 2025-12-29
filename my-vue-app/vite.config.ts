@@ -13,11 +13,12 @@ export default defineConfig({
         }
     },
     server: {
+        port: 3008, // Custom Frontend Port
         proxy: {
             // 规则 1 (高优先级): 系统数据同步接口 -> 转发给本地 Python 后端
-            // 后端地址是 http://127.0.0.1:8000/api/v1/...
+            // 后端地址是 http://127.0.0.1:8008/api/v1/...
             '^/api/v1/': {
-                target: 'http://127.0.0.1:8000',
+                target: 'http://127.0.0.1:8008',
                 changeOrigin: true,
                 // Python 后端路由定义包含了 /api/v1，所以这里不需要 rewrite 去掉前缀
             },

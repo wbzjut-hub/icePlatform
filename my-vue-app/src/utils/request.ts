@@ -7,7 +7,11 @@ import { useUserStore } from '@/store/modules/userStore'
 // 开发环境 (npm run dev): 默认为 undefined 或 '/api' (取决于 .env)，走 Vite 代理转发
 // 生产环境 (Electron 打包后): 必须显式指向本地 Python 后端地址，因为打包后没有 Vite 代理了
 const isProduction = import.meta.env.PROD
-const baseURL = isProduction ? 'http://127.0.0.1:8000' : import.meta.env.VITE_APP_BASE_API
+// 在生产环境 (Electron) 中，必须显式加上 /api/v1 前缀，因为后端 router 定义了 prefix
+// 在开发环境，如果 .env 没配，默认为 /api/v1 以匹配 vite proxy
+const baseURL = isProduction
+    ? 'http://127.0.0.1:8008/api/v1'
+    : (import.meta.env.VITE_APP_BASE_API || '/api/v1')
 
 // 创建 axios 实例
 const service: AxiosInstance = axios.create({

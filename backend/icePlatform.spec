@@ -5,8 +5,10 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
-    hiddenimports=[],
+    datas=[
+        ('models', 'whisper_models'), # Copy backend/models to dist/whisper_models
+    ],
+    hiddenimports=['whisper'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -35,7 +37,7 @@ exe = EXE(
 )
 coll = COLLECT(
     exe,
-    a.binaries,
+    a.binaries + [('bin/ffmpeg', 'bin/ffmpeg', 'BINARY')], # Use local bin/ffmpeg, put in bin/ folder
     a.datas,
     strip=False,
     upx=True,

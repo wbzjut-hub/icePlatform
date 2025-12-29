@@ -22,9 +22,10 @@
       </el-input>
     </div>
 
-    <!-- Bubble Icon (ICE Text) - Show when NOT docked -->
-    <div v-if="!isDocked" class="bubble-icon" @mousedown="onMouseDown">
-      <span class="ice-text">ICE</span>
+    <!-- Bubble Icon (ICE Text or Mic) - Show when NOT docked -->
+    <div v-if="!isDocked" class="bubble-icon" :class="{ 'is-recording': isRecording }" @mousedown="onMouseDown">
+      <el-icon v-if="isRecording" class="recording-icon"><Microphone /></el-icon>
+      <span v-else class="ice-text">ICE</span>
     </div>
 
     <!-- Dock Bar (Vertical Strip) - Show when DOCKED -->
@@ -37,8 +38,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue'
-import { Loading, Check } from '@element-plus/icons-vue'
+import { Loading, Check, Microphone } from '@element-plus/icons-vue'
 import { chatWithAiApi } from '@/api/modules/ai'
+import { voiceApi } from '@/api/modules/voice' // Import voice API
 import { ElMessage } from 'element-plus'
 
 const isExpanded = ref(false)
@@ -47,6 +49,80 @@ const isLoading = ref(false)
 const success = ref(false)
 const inputRef = ref()
 const dockSide = ref('left') // left or right
+
+// Voice Recording State
+const isRecording = ref(false)
+let mediaRecorder: MediaRecorder | null = null
+let audioChunks: Blob[] = []
+
+// Toggle Voice Recording
+const toggleVoiceRecording = async () => {
+  if (isRecording.value) {
+    stopRecording()
+  } else {
+    startRecording()
+  }
+}
+
+const startRecording = async () => {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        mediaRecorder = new MediaRecorder(stream)
+        audioChunks = []
+
+        mediaRecorder.ondataavailable = (event) => {
+            audioChunks.push(event.data)
+        }
+
+        mediaRecorder.onstop = async () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' }) // or webm
+            // Convert Blob to File
+            const audioFile = new File([audioBlob], "voice_command.wav", { type: "audio/wav" })
+            
+            isLoading.value = true
+            isRecording.value = false // UI reset
+            
+            try {
+                // 1. Transcribe
+                // Show "Thinking..." logic is handled by isLoading=true ? 
+                // Maybe update "ICE" text to "..."
+                const res = await voiceApi.transcribe(audioFile)
+                if (res && res.data && res.data.text) {
+                    inputText.value = res.data.text
+                    // 2. Auto-submit or let user confirm? 
+                    // User said "Thinking Cap" -> "seamless record". Auto-submit is better.
+                    handleSubmit() 
+                } else {
+                    ElMessage.warning('未检测到语音内容')
+                }
+            } catch (e) {
+                console.error(e)
+                ElMessage.error('语音识别失败')
+            } finally {
+                isLoading.value = false
+            }
+        }
+
+        mediaRecorder.start()
+        isRecording.value = true
+        // If hidden/docked, maybe expand? or stay bubble?
+        // Let's keep bubble but pulse red.
+        if (isDocked.value) {
+             onMouseEnter() // Undock to show status
+        }
+        
+    } catch (err) {
+        console.error("Error accessing microphone:", err)
+        ElMessage.error('无法访问麦克风')
+    }
+}
+
+const stopRecording = () => {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop()
+        mediaRecorder.stream.getTracks().forEach(track => track.stop())
+    }
+}
 
 // Toggle Expand/Collapse
 const toggleExpand = async () => {
@@ -89,7 +165,9 @@ const handleSubmit = async () => {
       
       setTimeout(() => {
         success.value = false
-        toggleExpand()
+        // Only collapse if it was expanded manually. 
+        // If it was voice command, maybe just show success tick in bubble?
+        if (isExpanded.value) toggleExpand()
       }, 1500)
     } else {
       ElMessage.warning('未能识别日程，请重试')
@@ -103,7 +181,7 @@ const handleSubmit = async () => {
   }
 }
 
-// --- Auto-Docking Logic ---
+// ... Auto-Docking Logic ... (Keep existing)
 let dockTimer: any = null
 const isDocked = ref(false)
 
@@ -115,27 +193,24 @@ const onMouseEnter = () => {
             const { ipcRenderer } = (window as any).require('electron')
             ipcRenderer.send('bubble-undock')
         }
-        // Actually wait for IPC to confirm undock?
-        // Or just set immediate. 
-        // Main process sends 'dock-side-changed' -> 'none'.
     }
 }
 
 const onMouseLeave = () => {
-    if (isExpanded.value) return 
+    if (isExpanded.value || isRecording.value) return // Don't dock if recording!
     
     // Start Timer
     dockTimer = setTimeout(() => {
-        if (!isExpanded.value) { 
+        if (!isExpanded.value && !isRecording.value) { 
              if ((window as any).require) {
                 const { ipcRenderer } = (window as any).require('electron')
                 ipcRenderer.send('bubble-dock')
             }
-            // Wait for IPC to set isDocked=true
         }
     }, 2000) 
 }
 
+// ... Drag Logic ... (Keep existing)
 const startDrag = (e: MouseEvent) => { /* ... */ }
 
 let isDragging = false
@@ -197,6 +272,14 @@ onMounted(() => {
            onMouseEnter() 
       }
       toggleExpand()
+    })
+
+    // Listen for Voice Toggle (Option+V)
+    ipcRenderer.on('bubble-toggle-voice', () => {
+        if (isDocked.value) {
+            onMouseEnter()
+        }
+        toggleVoiceRecording()
     })
     
     // Listen for Dock Side Change
@@ -272,9 +355,35 @@ onMounted(() => {
   align-items: center;
   cursor: grab;
   z-index: 10;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.3s; /* Smooth transitions */
   flex-shrink: 0; 
   user-select: none;
+  animation: breathe 3s infinite ease-in-out; /* Breathing Effect */
+}
+
+/* Breathing Keyframes */
+@keyframes breathe {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(100, 255, 218, 0.4);
+    border-color: rgba(100, 255, 218, 0.8);
+  }
+  50% {
+    transform: scale(1.05); /* Gentle expansion */
+    box-shadow: 0 0 25px rgba(100, 255, 218, 0.7); /* Brighter glow */
+    border-color: rgba(100, 255, 218, 1);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(100, 255, 218, 0.4);
+    border-color: rgba(100, 255, 218, 0.8);
+  }
+}
+
+.bubble-icon:hover {
+    animation-play-state: paused; /* Pause on hover to focus */
+    transform: scale(1.08); /* Slightly bigger on hover */
+    box-shadow: 0 0 30px rgba(100, 255, 218, 0.9);
 }
 
 .bubble-icon:active {
@@ -335,4 +444,28 @@ onMounted(() => {
   font-size: 10px;
   color: #8892b0;
 }
+
+/* Recording State */
+.bubble-icon.is-recording {
+  border-color: #f56c6c; /* Red border */
+  box-shadow: 0 0 20px rgba(245, 108, 108, 0.6);
+  animation: pulse-red 1s infinite alternate;
+}
+
+.recording-icon {
+  font-size: 24px;
+  color: #f56c6c;
+}
+
+@keyframes pulse-red {
+  from {
+    box-shadow: 0 0 10px rgba(245, 108, 108, 0.4);
+    transform: scale(1);
+  }
+  to {
+    box-shadow: 0 0 30px rgba(245, 108, 108, 0.8);
+    transform: scale(1.1);
+  }
+}
+
 </style>

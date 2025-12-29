@@ -41,14 +41,14 @@ export interface Workflow {
     tools_config: string[];
 }
 
-export const getSessionsApi = () => request.get<any, ChatSession[]>('/api/v1/ai/sessions')
-export const getMessagesApi = (sessionId: string) => request.get<any, ChatMessage[]>(`/api/v1/ai/sessions/${sessionId}/messages`)
-export const deleteSessionApi = (sessionId: string) => request.delete(`/api/v1/ai/sessions/${sessionId}`)
+export const getSessionsApi = () => request.get<any, ChatSession[]>('/ai/sessions')
+export const getMessagesApi = (sessionId: string) => request.get<any, ChatMessage[]>(`/ai/sessions/${sessionId}/messages`)
+export const deleteSessionApi = (sessionId: string) => request.delete(`/ai/sessions/${sessionId}`)
 
 export const chatWithAiApi = (message: string, sessionId?: string | null, workflowId: string = 'wf_agent') =>
-    request.post<any, ChatResponse>('/api/v1/ai/chat', { message, session_id: sessionId, workflow_id: workflowId })
+    request.post<any, ChatResponse>('/ai/chat', { message, session_id: sessionId, workflow_id: workflowId })
 
-export const getWorkflowsApi = () => request.get<any, Workflow[]>('/api/v1/ai/workflows')
-export const createWorkflowApi = (data: Workflow) => request.post<any, Workflow>('/api/v1/ai/workflows', data)
-export const updateWorkflowApi = (id: string, data: Workflow) => request.put<any, Workflow>(`/api/v1/ai/workflows/${id}`, data)
-export const deleteWorkflowApi = (id: string) => request.delete(`/api/v1/ai/workflows/${id}`)
+export const getWorkflowsApi = () => request.get<any, Workflow[]>('/ai/workflows')
+export const createWorkflowApi = (data: Workflow) => request.post<any, Workflow>('/ai/workflows', data)
+export const updateWorkflowApi = (id: string, data: Workflow) => request.put<any, Workflow>(`/ai/workflows/${id}`, data)
+export const deleteWorkflowApi = (id: string) => request.delete(`/ai/workflows/${id}`)

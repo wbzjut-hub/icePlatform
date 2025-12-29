@@ -11,7 +11,6 @@ router = APIRouter()
 
 # 获取所有数据，并按日期组装成前端需要的格式 Map<Date, {todos, notes}>
 @router.get("/all")
-@router.get("/all")
 def read_all_todos(db: Session = Depends(get_db)):
     print("👉 Entered read_all_todos handler")
     try:

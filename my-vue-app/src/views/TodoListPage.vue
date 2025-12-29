@@ -3,8 +3,16 @@
     <!-- 1. Top Dashboard Header -->
     <div class="dashboard-header">
       <div class="header-left">
+        <el-date-picker
+          v-model="selectedDate"
+          type="date"
+          placeholder="选择日期"
+          format="YYYY-MM-DD"
+          value-format="YYYY-MM-DD"
+          size="small"
+          class="header-date-picker"
+        />
         <h2 class="date-title">{{ formattedDate }}</h2>
-        <span class="env-status">System Status: ONLINE</span>
       </div>
       <div class="header-right">
         <div class="stat-card">
@@ -23,45 +31,28 @@
       </div>
     </div>
 
-    <!-- 2. Main Content Area (Sidebar + Columns) -->
+    <!-- 2. Main Content Area -->
     <div class="todo-page-body">
-      <div class="left-sidebar">
-        <!-- System Log on TOP -->
-        <DailyReport
-          :text="bubbleText"
-          :loading="petLoading"
-          @refresh="generateAiBriefing"
-          class="sidebar-report"
-        />
-        
-        <!-- Calendar on BOTTOM -->
-        <div class="calendar-container">
-          <el-calendar v-model="selectedDate" />
-        </div>
-      </div>
-
-      <div class="content-container">
+      <div class="content-container full-width">
         <div class="columns-wrapper">
-          <TaskColumn
-            title="任务待办"
-            placeholder="添加待办 (回车)"
-            empty-text="无待办任务"
-            :items="dailyTodos"
-            @add="addTodo"
-            @remove="removeTodo"
-            @toggle="toggleTodo"
-            @update="updateTodo"
-            @update:list="(l) => {}"
-          />
+          <div class="task-column-half">
+            <TaskColumn
+              title="任务待办"
+              placeholder="添加待办 (回车)"
+              empty-text="无待办任务"
+              :items="dailyTodos"
+              @add="addTodo"
+              @remove="removeTodo"
+              @toggle="toggleTodo"
+              @update="updateTodo"
+              @update:list="(l) => {}"
+            />
+          </div>
 
-          <TaskColumn
-            title="临时记录"
-            placeholder="添加记录 (回车)"
-            empty-text="无临时记录"
+          <StickyNotePad
             :items="dailyNotes"
             @add="addNote"
             @remove="removeNote"
-            @toggle="toggleNote"
             @update="updateNote"
           />
         </div>
@@ -83,6 +74,7 @@ import { ElMessage } from 'element-plus'
 // Components
 import TaskColumn from '@/components/todo/TaskColumn.vue'
 import DailyReport from '@/components/todo/DailyReport.vue'
+import StickyNotePad from '@/components/todo/StickyNotePad.vue'
 
 const router = useRouter()
 const appStore = useAppStore()
@@ -159,7 +151,7 @@ const generateAiBriefing = async () => {
 ### 📜 每日诗句
 (请创作或引用一句富有哲理、励志的短诗，最好带有科技或未来感，每天都不一样)
 `
-    const res = await chatWithAiApi(prompt, ROBOT_SESSION_ID, 'wf_agent')
+    const res = await chatWithAiApi(prompt, ROBOT_SESSION_ID, 'wf_general')
     if (res && res.reply) {
       bubbleText.value = res.reply
     }
@@ -293,9 +285,28 @@ onMounted(() => {
   height: 100%;
 }
 
+.content-container.full-width {
+  width: 100%;
+}
+
 .header-left {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-date-picker {
+  width: 140px !important;
+}
+
+.header-date-picker :deep(.el-input__wrapper) {
+  background-color: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 0 1px var(--border-color-tech) inset;
+}
+
+.header-date-picker :deep(.el-input__inner) {
+  color: var(--primary-accent-color);
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .date-title {
@@ -353,6 +364,12 @@ onMounted(() => {
   gap: 24px;
   min-height: 0;
   overflow: hidden; /* No scroll, adapt to width */
+}
+
+.task-column-half {
+  flex: 0 0 35%;
+  min-width: 0;
+  display: flex;
 }
 
 /* Calendar Overrides */

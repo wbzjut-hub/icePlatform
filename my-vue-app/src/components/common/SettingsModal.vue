@@ -26,6 +26,15 @@
             placeholder="sk-..."
         />
       </el-form-item>
+      <el-form-item label="Tavily Key">
+        <el-input
+            v-model="form.tavily_api_key"
+            type="password"
+            show-password
+            placeholder="tvly-..."
+        />
+        <div class="form-tip">用于联网搜索功能的 API Key</div>
+      </el-form-item>
       <el-form-item label="系统维护">
         <el-button type="warning" plain size="small" @click="handleClearCache">
           清除界面缓存并重启
@@ -61,7 +70,8 @@ const emit = defineEmits<{
 const saving = ref(false)
 const form = ref({
   openai_api_key: '',
-  openai_base_url: ''
+  openai_base_url: '',
+  tavily_api_key: ''
 })
 
 const onUpdateVisible = (val: boolean) => {

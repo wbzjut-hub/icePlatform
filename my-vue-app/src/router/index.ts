@@ -13,7 +13,7 @@ const addDynamicRoutes = (routerInstance: Router) => {
         dynamicItems.forEach(item => {
             // ！！！关键修改：将 '/ai-lab' 加入排除列表，避免重复添加静态路由！！！
             // 排除：API列表、待办清单、AI实验室
-            if (!['/api-list', '/todo-list', '/ai-lab'].includes(item.path) && !routerInstance.hasRoute(item.name)) {
+            if (!['/api-list', '/todo-list', '/ai-lab', '/svg-renderer', '/agent-manager', '/debate', '/think-tank', '/roundtable'].includes(item.path) && !routerInstance.hasRoute(item.name)) {
                 routerInstance.addRoute('Layout', {
                     path: item.path,
                     name: item.name,
@@ -31,11 +31,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'Login',
         component: () => import('@/views/Login.vue')
     },
-    {
-        path: '/bubble',
-        name: 'Bubble',
-        component: () => import('@/views/BubblePage.vue')
-    },
+
     {
         path: '/',
         name: 'Layout',
@@ -66,6 +62,30 @@ const routes: Array<RouteRecordRaw> = [
                 name: '智能体中心',
                 component: () => import('@/views/AgentManager/AgentManagerPage.vue'),
                 meta: { name: '智能体中心' }
+            },
+            {
+                path: 'think-tank',
+                name: '智囊团中心',
+                component: () => import('@/views/ThinkTank/ThinkTankPage.vue'),
+                meta: { name: '智囊团中心' }
+            },
+            {
+                path: 'svg-renderer',
+                name: 'SVG 实验室',
+                component: () => import('@/views/SvgRenderer/SvgRendererPage.vue'),
+                meta: { name: 'SVG 实验室' }
+            },
+            {
+                path: 'debate',
+                name: 'AI 辩论赛',
+                component: () => import('@/views/DebatePage/DebatePage.vue'),
+                meta: { name: 'AI 辩论赛' }
+            },
+            {
+                path: 'roundtable',
+                name: '专家圆桌',
+                component: () => import('@/views/RoundtablePage/RoundtablePage.vue'),
+                meta: { name: '专家圆桌' }
             }
         ]
     },
