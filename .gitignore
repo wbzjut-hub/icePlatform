@@ -3,13 +3,13 @@ __pycache__/
 *.py[cod]
 venv/
 .env
-backend/bin/
+
 backend/error.log
 backend_debug.log
 backend/build/
 backend/dist/
-backend/bin/
-backend/bin/
+
+
 release/
 
 # Frontend
